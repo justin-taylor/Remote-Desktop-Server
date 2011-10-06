@@ -53,9 +53,11 @@ public class RemoteDataServer implements Runnable{
 			}
 			catch(BindException e){
 				setListenerMessage("Port "+PORT+" is already in use. Use a different Port");
+				setConnectButtonEnabled(false);
 			}
 			catch(Exception e){
 				setListenerMessage("Unable to connect");
+				setConnectButtonEnabled(false);
 			}
 			
 			while(connected){
@@ -78,13 +80,21 @@ public class RemoteDataServer implements Runnable{
 				}catch(Exception e){
 					System.out.println(e);
 					setListenerMessage("Disconnected");
-					connected = false;}
+					setConnectButtonEnabled(false);
+					connected = false;
+				}
 			}
 		}
 		
 		private void setListenerMessage(String msg){
 			if(window != null){
 				window.setMessage(msg);
+			}
+		}
+		
+		private void setConnectButtonEnabled(boolean enable){
+			if(window != null){
+				window.setConnectButtonEnabled(enable);
 			}
 		}
 		

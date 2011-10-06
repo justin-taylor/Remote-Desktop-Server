@@ -74,6 +74,15 @@ public class ServerWindow extends ServerListener implements ActionListener{
 		window.setLocationRelativeTo(null);
 		window.setVisible(true);
 		window.setResizable(false);
+		
+		int port = Integer.parseInt(portTxt.getText());
+		try{
+			InetAddress ip = InetAddress.getByName(ipTxt.getText());
+			//InetAddress ip = InetAddress.getByName("192.168.1.104");
+			runServer(port, ip);
+		}catch(UnknownHostException err){
+			serverMessages.setText("Error: Check that the ip you have entered is correct.");
+		}
 	}
 	
 	public void actionPerformed(ActionEvent e){
@@ -83,8 +92,8 @@ public class ServerWindow extends ServerListener implements ActionListener{
 			if((JButton)src == connectButton){
 				int port = Integer.parseInt(portTxt.getText());
 				try{
-					//InetAddress ip = InetAddress.getByName(ipTxt.getText());
-					InetAddress ip = InetAddress.getByName("192.168.1.104");
+					InetAddress ip = InetAddress.getByName(ipTxt.getText());
+					//InetAddress ip = InetAddress.getByName("192.168.1.104");
 					runServer(port, ip);
 				}catch(UnknownHostException err){
 					serverMessages.setText("Error: Check that the ip you have entered is correct.");
@@ -107,6 +116,7 @@ public class ServerWindow extends ServerListener implements ActionListener{
 			connectButton.setEnabled(false);
 		}else{
 			serverMessages.setText("The port Number must be less than 10000");
+			connectButton.setEnabled(true);
 		}
 	}
 	
@@ -119,6 +129,10 @@ public class ServerWindow extends ServerListener implements ActionListener{
 	
 	public void setMessage(String msg){
 		serverMessages.setText(msg);
+	}
+	
+	public void setConnectButtonEnabled(boolean enable){
+		connectButton.setEnabled(enable);
 	}
 	
 	public static void main(String[] args){

@@ -61,7 +61,7 @@ public class AutoBot {
 				default: System.out.println("ELSE:" + event); break;
 			}
 				
-		}catch(Exception e){ e.printStackTrace(); }
+		}catch(Exception e){ e.printStackTrace(); System.out.println("error here "+event); }
 	}
 		
 	public void moveMouse(int x, int y){
