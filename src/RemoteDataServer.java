@@ -1,17 +1,22 @@
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+
 import java.net.BindException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
-import javax.imageio.ImageIO;
+import messages.Constants;
 
 public class RemoteDataServer implements Runnable{
-		int PORT;
-		
+	
+		// local settings
+		private int PORT;
 		private InetAddress ipAddress;
+		
+		
+		//remote settings
+		private int listenerPort;
+		private InetAddress listenerAddress;
+		
 		private DatagramSocket server;
 		private byte[] buf;
 		private DatagramPacket dgp;
@@ -19,7 +24,13 @@ public class RemoteDataServer implements Runnable{
 		private String message;
 		private AutoBot bot;
 		
+		private static final int REFRESH_THRESHOLD = 100;
+		private int count = 0;
+		
 		private ServerListener window;
+		
+		private ImageSender sender;
+
 		
 		public RemoteDataServer(int port){
 			PORT = port;
@@ -64,18 +75,38 @@ public class RemoteDataServer implements Runnable{
 				// get message from sender
 				try{ server.receive(dgp);
 				
+					// store the packets address for sending images out
+					listenerAddress = dgp.getAddress();
+				
 					// translate and use the message to automate the desktop
 					message = new String(dgp.getData(), 0, dgp.getLength());
-					if (message.equals("Connectivity")){
+					if (message.equals("Connectivity"))
+					{
 						setListenerMessage("Trying to Connect");
 						server.send(dgp); //echo the message back
-					}else if(message.equals("Connected")){
+					}
+					
+					else if(message.equals("Connected"))
+					{
 						server.send(dgp); //echo the message back
-					}else if(message.equals("Close")){
+					}
+					
+					else if(message.equals("Close"))
+					{
 						setListenerMessage("Controller has Disconnected. Trying to reconnect."); //echo the message back
-					}else{
+					}
+					
+					else
+					{
 						setListenerMessage("Connected to Controller");
 						bot.handleMessage(message);
+						
+						count++;
+						if(count == REFRESH_THRESHOLD)
+						{
+							count = 0;
+							sendImage();
+						}
 					}
 				}catch(Exception e){
 					System.out.println(e);
@@ -99,25 +130,20 @@ public class RemoteDataServer implements Runnable{
 		}
 		
 		public void sendImage(){
-			Thread send_image_thread = new Thread(new ImageSender());
-			send_image_thread.start();
+			if(sender == null && listenerAddress != null)
+			{
+				sender = new ImageSender(listenerAddress, listenerPort);
+			}
+			
+			if(sender != null)
+			{
+				sender.setPort(listenerPort);
+				sender.setImage( bot.getScreenCap() );
+			
+				Thread send_image_thread = new Thread(sender);
+				send_image_thread.start();
+			}
 		}
 
-		//TODO this class needs to be moved out or made private
-		public class ImageSender implements Runnable{
-			public void run(){
-				BufferedImage img = bot.getScreenCap();
-				ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-				try{
-					ImageIO.write(img, "png", buffer);
-				}catch(IOException e){System.out.println(e);}	
-				byte[] data = buffer.toByteArray();
-			    
-	            DatagramPacket out = new DatagramPacket(data, data.length, ipAddress, PORT);
-	            try{ server.send(out); }
-	            catch(IOException e){//System.out.println(e);
-	            	
-	            }
-			}// close run
-		}// close ImageSender class
+		
 	}

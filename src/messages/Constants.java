@@ -22,6 +22,8 @@ public class Constants {
 	
 	public static final char MOVEMOUSE = 'p';
 	
+	public static final char SETLISTENERPORT = 'L';
+	
 	/*
 	 *  Returns a string in the format that can be laster parsed
 	 *  format: MOVEMOUSEintxDELIMITERinty

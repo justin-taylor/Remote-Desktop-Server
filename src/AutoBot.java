@@ -26,10 +26,7 @@ public class AutoBot {
 	int lastXpos = 0;
 	int lastYpos = 0;
 	
-	int count = 0;
 	int lastScrollY;
-	
-	public BufferedImage img;
 	
 	public AutoBot(){
 		try{ robot = new Robot(); }
@@ -209,18 +206,15 @@ public class AutoBot {
 		}catch(Exception e){}
 	}
 	
-	public void screenCap(){
-		if(count < 10){
-			count++;
-			return;
-		}
-		count = 0;
-		Rectangle captureSize = new Rectangle(lastXpos, lastYpos, 500, 500);
-		img = robot.createScreenCapture(captureSize);
-	
+	public BufferedImage getScreenCap(){
+		
 		// get the current location of the mouse
 		// this is used to actually draw the mouse
 		Point mousePosition = MouseInfo.getPointerInfo().getLocation();
+		
+		Rectangle captureSize = new Rectangle(mousePosition.x, mousePosition.y, 100, 100);
+		BufferedImage img = robot.createScreenCapture(captureSize);
+
 	
 		// start drawing the mouse onto the image;
 	 	Polygon pointer = new Polygon(new int[]{0,16,10,8},new int[]{0,8,10,16},4);
@@ -235,13 +229,11 @@ public class AutoBot {
 		grfx.setColor( Color.red );
 		grfx.drawPolygon( pointer );
 		grfx.dispose();
-	 	
+		
 		// this method may need to return raw data later for compression into a video
 		//int[] rawData = new int[recordArea.width*recordArea.height];
 		//img.getRGB(0,0,recordArea.width,recordArea.height,rawData,0,recordArea.width);
-	}
-	
-	public BufferedImage getScreenCap(){
+		
 		return img;
 	}
 }

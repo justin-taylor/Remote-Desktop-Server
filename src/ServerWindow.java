@@ -5,6 +5,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
 import java.net.*;
 
 public class ServerWindow extends ServerListener implements ActionListener{
@@ -13,7 +14,7 @@ public class ServerWindow extends ServerListener implements ActionListener{
 	
 	private Thread sThread; //server thread
 	
-	private static final int WINDOW_HEIGHT = 200;
+	private static final int WINDOW_HEIGHT = 225;
 	private static final int WINDOW_WIDTH = 350;
 	
 	private String ipAddress;
@@ -29,6 +30,8 @@ public class ServerWindow extends ServerListener implements ActionListener{
 	
 	private JButton connectButton = new JButton("Connect");
 	private JButton disconnectButton = new JButton("Disconnect");
+	private JButton shutdownButton = new JButton("Shutdown");
+	
 	
 	public ServerWindow(){
 		
@@ -40,6 +43,7 @@ public class ServerWindow extends ServerListener implements ActionListener{
 		
 		connectButton.addActionListener(this);
 		disconnectButton.addActionListener(this);
+		shutdownButton.addActionListener(this);
 		
 		Container c = window.getContentPane();
 		c.setLayout(new FlowLayout());
@@ -70,6 +74,7 @@ public class ServerWindow extends ServerListener implements ActionListener{
 		c.add(disconnectButton);
 		c.add(buffers[2]);
 		c.add(serverMessages);
+		c.add(shutdownButton);
 		ipTxt.setSize(100, 20);
 		window.setLocationRelativeTo(null);
 		window.setVisible(true);
@@ -77,8 +82,8 @@ public class ServerWindow extends ServerListener implements ActionListener{
 		
 		int port = Integer.parseInt(portTxt.getText());
 		try{
-			InetAddress ip = InetAddress.getByName(ipTxt.getText());
-			//InetAddress ip = InetAddress.getByName("192.168.1.104");
+			//InetAddress ip = InetAddress.getByName(ipTxt.getText());
+			InetAddress ip = InetAddress.getByName("192.168.1.101");
 			runServer(port, ip);
 		}catch(UnknownHostException err){
 			serverMessages.setText("Error: Check that the ip you have entered is correct.");
@@ -102,6 +107,12 @@ public class ServerWindow extends ServerListener implements ActionListener{
 				
 			else if((JButton)src == disconnectButton){
 				closeServer();
+			}
+			
+			else if((JButton)src == shutdownButton){
+				closeServer();
+				shutdown();
+				System.exit(0);
 			}
 		}
 	}
@@ -134,6 +145,32 @@ public class ServerWindow extends ServerListener implements ActionListener{
 	public void setConnectButtonEnabled(boolean enable){
 		connectButton.setEnabled(enable);
 	}
+	
+	private static void shutdown(){
+	    String shutdownCommand;
+	    String operatingSystem = System.getProperty("os.name");
+
+	    if ("Linux".equals(operatingSystem) || "Mac OS X".equals(operatingSystem)) {
+	        shutdownCommand = "shutdown -h now";
+	    }
+	    else if ("Windows".equals(operatingSystem)) {
+	        shutdownCommand = "shutdown.exe -s -t 0";
+	    }
+	    else {
+	    	shutdownCommand = "null";
+	    }
+
+	    Runtime runtime = Runtime.getRuntime();
+        try {
+			Process proc = runtime.exec(shutdownCommand);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
+	}
+
 	
 	public static void main(String[] args){
 		new ServerWindow();
