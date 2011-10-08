@@ -22,7 +22,7 @@ public class Constants {
 	
 	public static final char MOVEMOUSE = 'p';
 	
-	public static final char SETLISTENERPORT = 'L';
+	public static final char REQUESTIMAGE = 'I';
 	
 	/*
 	 *  Returns a string in the format that can be laster parsed

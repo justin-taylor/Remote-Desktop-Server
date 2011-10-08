@@ -4,6 +4,8 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
+import messages.Constants;
+
 public class RemoteDataServer implements Runnable{
 	
 		// local settings
@@ -21,10 +23,7 @@ public class RemoteDataServer implements Runnable{
 		
 		private String message;
 		private AutoBot bot;
-		
-		private static final int REFRESH_THRESHOLD = 10;
-		private int count = 0;
-		
+				
 		private ServerListener window;
 		
 		private ImageSender sender;
@@ -77,7 +76,7 @@ public class RemoteDataServer implements Runnable{
 				
 					// store the packets address for sending images out
 					listenerAddress = dgp.getAddress();
-				
+			
 					// translate and use the message to automate the desktop
 					message = new String(dgp.getData(), 0, dgp.getLength());
 					if (message.equals("Connectivity"))
@@ -96,17 +95,15 @@ public class RemoteDataServer implements Runnable{
 						setListenerMessage("Controller has Disconnected. Trying to reconnect."); //echo the message back
 					}
 					
+					else if(message.charAt(0) == Constants.REQUESTIMAGE)
+					{
+						sendImage();
+					}
+					
 					else
 					{
 						setListenerMessage("Connected to Controller");
 						bot.handleMessage(message);
-						
-						count++;
-						if(count == REFRESH_THRESHOLD)
-						{
-							count = 0;
-							sendImage();
-						}
 					}
 				}catch(Exception e){
 					System.out.println(e);
