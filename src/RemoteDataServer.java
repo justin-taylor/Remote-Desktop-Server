@@ -4,8 +4,6 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
-import messages.Constants;
-
 public class RemoteDataServer implements Runnable{
 	
 		// local settings
@@ -14,7 +12,7 @@ public class RemoteDataServer implements Runnable{
 		
 		
 		//remote settings
-		private int listenerPort;
+		private int clientPort;
 		private InetAddress listenerAddress;
 		
 		private DatagramSocket server;
@@ -24,7 +22,7 @@ public class RemoteDataServer implements Runnable{
 		private String message;
 		private AutoBot bot;
 		
-		private static final int REFRESH_THRESHOLD = 100;
+		private static final int REFRESH_THRESHOLD = 10;
 		private int count = 0;
 		
 		private ServerListener window;
@@ -46,6 +44,8 @@ public class RemoteDataServer implements Runnable{
 		}
 		
 		public void setPort(int port){ PORT = port; }
+		
+		public void setClientPort(int port){  clientPort = port; }
 		
 		public void setIP(InetAddress inet){ ipAddress = inet; }
 		
@@ -132,12 +132,12 @@ public class RemoteDataServer implements Runnable{
 		public void sendImage(){
 			if(sender == null && listenerAddress != null)
 			{
-				sender = new ImageSender(listenerAddress, listenerPort);
+				sender = new ImageSender(listenerAddress, clientPort);
 			}
 			
 			if(sender != null)
 			{
-				sender.setPort(listenerPort);
+				sender.setPort(clientPort);
 				sender.setImage( bot.getScreenCap() );
 			
 				Thread send_image_thread = new Thread(sender);

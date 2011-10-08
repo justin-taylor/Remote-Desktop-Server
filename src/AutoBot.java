@@ -212,18 +212,21 @@ public class AutoBot {
 		// this is used to actually draw the mouse
 		Point mousePosition = MouseInfo.getPointerInfo().getLocation();
 		
-		Rectangle captureSize = new Rectangle(mousePosition.x, mousePosition.y, 100, 100);
+		int rectWidth = 100;
+		int rectHeight = 100;
+		
+		int x = (int) (mousePosition.x - (rectWidth * 0.5));
+		int y = (int) (mousePosition.y - (rectHeight * 0.5));
+		
+		Rectangle captureSize = new Rectangle(x, y, rectWidth, rectHeight);
 		BufferedImage img = robot.createScreenCapture(captureSize);
 
 	
 		// start drawing the mouse onto the image;
 	 	Polygon pointer = new Polygon(new int[]{0,16,10,8},new int[]{0,8,10,16},4);
-		Polygon pointerShadow = new Polygon(new int[]{6,21,16,14},new int[]{1,9,11,17},4);
 	 	
 	 	Graphics2D grfx = img.createGraphics();
-		grfx.translate(mousePosition.x,mousePosition.y);
-		grfx.setColor( new Color(100,100,100,100) );
-		grfx.fillPolygon( pointerShadow );
+		grfx.translate((rectWidth * 0.5), (rectHeight * 0.5));
 		grfx.setColor( new Color(100,100,255,200) );
 		grfx.fillPolygon( pointer );
 		grfx.setColor( Color.red );

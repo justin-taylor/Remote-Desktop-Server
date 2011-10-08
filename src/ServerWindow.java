@@ -14,7 +14,7 @@ public class ServerWindow extends ServerListener implements ActionListener{
 	
 	private Thread sThread; //server thread
 	
-	private static final int WINDOW_HEIGHT = 225;
+	private static final int WINDOW_HEIGHT = 275;
 	private static final int WINDOW_WIDTH = 350;
 	
 	private String ipAddress;
@@ -23,8 +23,12 @@ public class ServerWindow extends ServerListener implements ActionListener{
 	
 	private JLabel addressLabel = new JLabel("");
 	private JLabel portLabel = new JLabel("PORT: ");
-	private JTextArea[] buffers = new JTextArea[3];
+	private JLabel clientPortLabel = new JLabel("Outgoing PORT: ");
+	
+	private JTextArea[] buffers = new JTextArea[4];
 	private JTextField portTxt = new JTextField(5);
+	
+	private JTextField clientPortTxt = new JTextField(5);
 	private JTextField ipTxt = new JTextField(10);
 	private JLabel serverMessages = new JLabel("Not Connected");
 	
@@ -57,7 +61,7 @@ public class ServerWindow extends ServerListener implements ActionListener{
 		catch(Exception e){addressLabel.setText("IP Address Could Not be Resolved, Try typing in the IP address.");}
 		
 		int x;
-		for(x = 0; x < 3; x++){
+		for(x = 0; x < 4; x++){
 			buffers[x] = new JTextArea("", 1, 30);
 			buffers[x].setEditable(false);
 			buffers[x].setBackground(window.getBackground());
@@ -69,11 +73,19 @@ public class ServerWindow extends ServerListener implements ActionListener{
 		c.add(portLabel);
 		portTxt.setText("5444");
 		c.add(portTxt);
+
+		c.add(buffers[3]);
+		
+		c.add(clientPortLabel);
+		clientPortTxt.setText("5555");
+		c.add(clientPortTxt);
+		
 		c.add(buffers[1]);
 		c.add(connectButton);
 		c.add(disconnectButton);
 		c.add(buffers[2]);
 		c.add(serverMessages);
+		
 		c.add(shutdownButton);
 		ipTxt.setSize(100, 20);
 		window.setLocationRelativeTo(null);
@@ -81,10 +93,12 @@ public class ServerWindow extends ServerListener implements ActionListener{
 		window.setResizable(false);
 		
 		int port = Integer.parseInt(portTxt.getText());
+		int clientPort = Integer.parseInt(clientPortTxt.getText());
+
 		try{
 			//InetAddress ip = InetAddress.getByName(ipTxt.getText());
 			InetAddress ip = InetAddress.getByName("192.168.1.101");
-			runServer(port, ip);
+			runServer(port, clientPort, ip);
 		}catch(UnknownHostException err){
 			serverMessages.setText("Error: Check that the ip you have entered is correct.");
 		}
@@ -96,10 +110,11 @@ public class ServerWindow extends ServerListener implements ActionListener{
 		if(src instanceof JButton){
 			if((JButton)src == connectButton){
 				int port = Integer.parseInt(portTxt.getText());
+				int clientPort = Integer.parseInt(clientPortTxt.getText());
 				try{
 					InetAddress ip = InetAddress.getByName(ipTxt.getText());
 					//InetAddress ip = InetAddress.getByName("192.168.1.104");
-					runServer(port, ip);
+					runServer(port, clientPort, ip);
 				}catch(UnknownHostException err){
 					serverMessages.setText("Error: Check that the ip you have entered is correct.");
 				}
@@ -117,9 +132,10 @@ public class ServerWindow extends ServerListener implements ActionListener{
 		}
 	}
 	
-	public void runServer(int port, InetAddress ip){
+	public void runServer(int port, int listenerPort, InetAddress ip){
 		if(port <= 9999){
 			server.setPort(port);
+			server.setClientPort(listenerPort);
 			server.setIP(ip);
 			sThread = new Thread(server);
 			sThread.start();
