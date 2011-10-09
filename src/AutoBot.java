@@ -62,12 +62,17 @@ public class AutoBot {
 	}
 		
 	public void moveMouse(int x, int y){
+		try{
 		//get the current position of the mouse cursor
 		int current_x_local = MouseInfo.getPointerInfo().getLocation().x;
 		int current_y_local = MouseInfo.getPointerInfo().getLocation().y;
 		
 		//move the mouse relative to the current position
 		robot.mouseMove(current_x_local + x, current_y_local + y);
+		}catch(NullPointerException e){
+			// Not sure why this exception occurs
+			System.out.print("NUll pointer exception on mouse move");
+		}
 	}
 	
 	public void specialKey(int key_code){
@@ -206,36 +211,29 @@ public class AutoBot {
 		}catch(Exception e){}
 	}
 	
-	public BufferedImage getScreenCap(){
+	public BufferedImage getScreenCap(int width, int height){
 		
 		// get the current location of the mouse
 		// this is used to actually draw the mouse
 		Point mousePosition = MouseInfo.getPointerInfo().getLocation();
+				
+		int x = (int) (mousePosition.x - (width * 0.5));
+		int y = (int) (mousePosition.y - (height * 0.5));
 		
-		int rectWidth = 100;
-		int rectHeight = 100;
-		
-		int x = (int) (mousePosition.x - (rectWidth * 0.5));
-		int y = (int) (mousePosition.y - (rectHeight * 0.5));
-		
-		Rectangle captureSize = new Rectangle(x, y, rectWidth, rectHeight);
+		Rectangle captureSize = new Rectangle(x, y, width, height);
 		BufferedImage img = robot.createScreenCapture(captureSize);
 
 	
 		// start drawing the mouse onto the image;
-	 	Polygon pointer = new Polygon(new int[]{0,16,10,8},new int[]{0,8,10,16},4);
-	 	
+		Polygon pointer = new Polygon(new int[]{0, -4, 4},new int[]{0, 8, 8}, 3);
+		
 	 	Graphics2D grfx = img.createGraphics();
-		grfx.translate((rectWidth * 0.5), (rectHeight * 0.5));
+		grfx.translate((width * 0.5), (height * 0.5));
 		grfx.setColor( new Color(100,100,255,200) );
 		grfx.fillPolygon( pointer );
 		grfx.setColor( Color.red );
 		grfx.drawPolygon( pointer );
 		grfx.dispose();
-		
-		// this method may need to return raw data later for compression into a video
-		//int[] rawData = new int[recordArea.width*recordArea.height];
-		//img.getRGB(0,0,recordArea.width,recordArea.height,rawData,0,recordArea.width);
 		
 		return img;
 	}

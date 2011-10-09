@@ -75,8 +75,7 @@ public class RemoteDataServer implements Runnable{
 				try{ server.receive(dgp);
 				
 					// store the packets address for sending images out
-					listenerAddress = dgp.getAddress();
-			
+					listenerAddress = dgp.getAddress();				
 					// translate and use the message to automate the desktop
 					message = new String(dgp.getData(), 0, dgp.getLength());
 					if (message.equals("Connectivity"))
@@ -97,7 +96,12 @@ public class RemoteDataServer implements Runnable{
 					
 					else if(message.charAt(0) == Constants.REQUESTIMAGE)
 					{
-						sendImage();
+						
+						String[] arr = message.split(Constants.DELIMITER+"");
+						System.out.print(arr[1]);
+						System.out.print(arr[2]);
+						
+						sendImage(Integer.parseInt(arr[1]), Integer.parseInt(arr[2]));
 					}
 					
 					else
@@ -126,7 +130,7 @@ public class RemoteDataServer implements Runnable{
 			}
 		}
 		
-		public void sendImage(){
+		public void sendImage(int width, int height){
 			if(sender == null && listenerAddress != null)
 			{
 				sender = new ImageSender(listenerAddress, clientPort);
@@ -134,8 +138,18 @@ public class RemoteDataServer implements Runnable{
 			
 			if(sender != null)
 			{
+				
+				
+				float scale = 1.0f;
+				if(width > height)
+				{
+					scale = ImageSender.SIZETHRESHOLD/width;
+				}else{
+					scale = ImageSender.SIZETHRESHOLD/height;
+				}
+				
 				sender.setPort(clientPort);
-				sender.setImage( bot.getScreenCap() );
+				sender.setImage( bot.getScreenCap((int)Math.round(width*scale), (int)Math.round(height * scale)) );
 			
 				Thread send_image_thread = new Thread(sender);
 				send_image_thread.start();

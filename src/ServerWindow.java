@@ -7,6 +7,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
 import java.net.*;
+import java.util.Collections;
+import java.util.Enumeration;
 
 public class ServerWindow extends ServerListener implements ActionListener{
 	
@@ -53,7 +55,7 @@ public class ServerWindow extends ServerListener implements ActionListener{
 		c.setLayout(new FlowLayout());
 		
 		try{
-			InetAddress ip = InetAddress.getLocalHost();
+			InetAddress ip = getIpAddress();
 			ipAddress = ip.getHostAddress();
 			addressLabel.setText("IP Address: ");
 			ipTxt.setText(ipAddress);
@@ -96,12 +98,38 @@ public class ServerWindow extends ServerListener implements ActionListener{
 		int clientPort = Integer.parseInt(clientPortTxt.getText());
 
 		try{
-			//InetAddress ip = InetAddress.getByName(ipTxt.getText());
-			InetAddress ip = InetAddress.getByName("192.168.1.101");
+			InetAddress ip = InetAddress.getByName(ipTxt.getText());
 			runServer(port, clientPort, ip);
 		}catch(UnknownHostException err){
 			serverMessages.setText("Error: Check that the ip you have entered is correct.");
 		}
+	}
+	
+	
+	private InetAddress getIpAddress() throws Exception
+	{
+		// this first line generally works on mac and windows
+		InetAddress ip = InetAddress.getLocalHost();
+		
+		// but on linux...
+		if(ip.isLoopbackAddress())
+		{
+			//loop trough all network interfaces
+			Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
+            for (NetworkInterface netint : Collections.list(nets))
+            {
+            	//loop through the ip address associated with the interface
+            	Enumeration<InetAddress> inetAddresses = netint.getInetAddresses();
+                for (InetAddress inetAddress : Collections.list(inetAddresses)) {
+                	
+                	// if the address is no the loopback and is not ipv6
+                	if(!inetAddress.isLoopbackAddress() && !inetAddress.toString().contains(":"))
+                		return inetAddress;
+                }
+            }
+		}
+		
+		return ip;
 	}
 	
 	public void actionPerformed(ActionEvent e){
@@ -113,7 +141,6 @@ public class ServerWindow extends ServerListener implements ActionListener{
 				int clientPort = Integer.parseInt(clientPortTxt.getText());
 				try{
 					InetAddress ip = InetAddress.getByName(ipTxt.getText());
-					//InetAddress ip = InetAddress.getByName("192.168.1.104");
 					runServer(port, clientPort, ip);
 				}catch(UnknownHostException err){
 					serverMessages.setText("Error: Check that the ip you have entered is correct.");
@@ -122,10 +149,13 @@ public class ServerWindow extends ServerListener implements ActionListener{
 				
 			else if((JButton)src == disconnectButton){
 				closeServer();
+				connectButton.setEnabled(true);
 			}
 			
 			else if((JButton)src == shutdownButton){
 				closeServer();
+				connectButton.setEnabled(true);
+				
 				shutdown();
 				System.exit(0);
 			}
@@ -133,7 +163,7 @@ public class ServerWindow extends ServerListener implements ActionListener{
 	}
 	
 	public void runServer(int port, int listenerPort, InetAddress ip){
-		if(port <= 9999){
+		if(port < 65535){
 			server.setPort(port);
 			server.setClientPort(listenerPort);
 			server.setIP(ip);
@@ -142,16 +172,14 @@ public class ServerWindow extends ServerListener implements ActionListener{
 			serverMessages.setText("Waiting for connection on " + ip);
 			connectButton.setEnabled(false);
 		}else{
-			serverMessages.setText("The port Number must be less than 10000");
+			serverMessages.setText("The port Number must be less than 65535");
 			connectButton.setEnabled(true);
 		}
 	}
 	
 	public void closeServer(){
 		server.shutdown();
-		
 		serverMessages.setText("Disconnected");
-		connectButton.setEnabled(true);
 	}
 	
 	public void setMessage(String msg){
@@ -183,8 +211,6 @@ public class ServerWindow extends ServerListener implements ActionListener{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-
 	}
 
 	
