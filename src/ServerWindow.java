@@ -36,7 +36,7 @@ public class ServerWindow extends ServerListener implements ActionListener{
 	
 	private JButton connectButton = new JButton("Connect");
 	private JButton disconnectButton = new JButton("Disconnect");
-	private JButton shutdownButton = new JButton("Shutdown");
+	//private JButton shutdownButton = new JButton("Shutdown");
 	
 	
 	public ServerWindow(){
@@ -49,7 +49,7 @@ public class ServerWindow extends ServerListener implements ActionListener{
 		
 		connectButton.addActionListener(this);
 		disconnectButton.addActionListener(this);
-		shutdownButton.addActionListener(this);
+		//shutdownButton.addActionListener(this);
 		
 		Container c = window.getContentPane();
 		c.setLayout(new FlowLayout());
@@ -88,7 +88,7 @@ public class ServerWindow extends ServerListener implements ActionListener{
 		c.add(buffers[2]);
 		c.add(serverMessages);
 		
-		c.add(shutdownButton);
+		//c.add(shutdownButton);
 		ipTxt.setSize(100, 20);
 		window.setLocationRelativeTo(null);
 		window.setVisible(true);
@@ -103,6 +103,14 @@ public class ServerWindow extends ServerListener implements ActionListener{
 		}catch(UnknownHostException err){
 			serverMessages.setText("Error: Check that the ip you have entered is correct.");
 		}
+		
+		Runtime.getRuntime().addShutdownHook(new Thread()
+		{
+			public void run()
+			{
+				System.exit(0);
+			}
+		});
 	}
 	
 	
@@ -151,7 +159,7 @@ public class ServerWindow extends ServerListener implements ActionListener{
 				closeServer();
 				connectButton.setEnabled(true);
 			}
-			
+			/*
 			else if((JButton)src == shutdownButton){
 				closeServer();
 				connectButton.setEnabled(true);
@@ -159,6 +167,7 @@ public class ServerWindow extends ServerListener implements ActionListener{
 				shutdown();
 				System.exit(0);
 			}
+			*/
 		}
 	}
 	
