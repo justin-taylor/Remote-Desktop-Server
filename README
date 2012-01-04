@@ -1,3 +1,5 @@
 Receives incoming messages over a UDP socket to either complete a simple user interaction (move mouse, type keys) or send a small screen capture of the current mouse location.
 
+see: https://github.com/justin-taylor/Android-remote-client
+
 Currently there is a known issue where the screen capture does not work with Android 4.0
