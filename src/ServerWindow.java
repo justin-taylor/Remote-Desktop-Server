@@ -49,7 +49,7 @@ public class ServerWindow extends ServerListener implements ActionListener{
 		
 		connectButton.addActionListener(this);
 		disconnectButton.addActionListener(this);
-		shutdownButton.addActionListener(this);
+		//shutdownButton.addActionListener(this);
 		
 		Container c = window.getContentPane();
 		c.setLayout(new FlowLayout());
@@ -88,7 +88,7 @@ public class ServerWindow extends ServerListener implements ActionListener{
 		c.add(buffers[2]);
 		c.add(serverMessages);
 		
-		c.add(shutdownButton);
+		//c.add(shutdownButton);
 		ipTxt.setSize(100, 20);
 		window.setLocationRelativeTo(null);
 		window.setVisible(true);
@@ -149,13 +149,11 @@ public class ServerWindow extends ServerListener implements ActionListener{
 				
 			else if((JButton)src == disconnectButton){
 				closeServer();
-				connectButton.setEnabled(true);
+				setConnectButtonEnabled(true);
 			}
 			
 			else if((JButton)src == shutdownButton){
 				closeServer();
-				connectButton.setEnabled(true);
-				
 				shutdown();
 				System.exit(0);
 			}
@@ -179,7 +177,7 @@ public class ServerWindow extends ServerListener implements ActionListener{
 	
 	public void closeServer(){
 		server.shutdown();
-		serverMessages.setText("Disconnected");
+		setMessage("Disconnected");
 	}
 	
 	public void setMessage(String msg){

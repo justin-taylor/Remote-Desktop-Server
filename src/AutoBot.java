@@ -222,14 +222,12 @@ public class AutoBot {
 		
 		Rectangle captureSize = new Rectangle(x, y, width, height);
 		BufferedImage img = robot.createScreenCapture(captureSize);
-
-	
 		// start drawing the mouse onto the image;
 		Polygon pointer = new Polygon(new int[]{0, -4, 4},new int[]{0, 8, 8}, 3);
 		
 	 	Graphics2D grfx = img.createGraphics();
 		grfx.translate((width * 0.5), (height * 0.5));
-		grfx.setColor( new Color(100,100,255,200) );
+		grfx.setColor( new Color(100,100,255,255) );
 		grfx.fillPolygon( pointer );
 		grfx.setColor( Color.red );
 		grfx.drawPolygon( pointer );

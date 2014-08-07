@@ -20,7 +20,6 @@ public class ImageSender implements Runnable{
 	private InetAddress clientAddr;
 	private int clientPort;
 	private DatagramSocket socket;
-	byte[] buf = new byte[65000];
 	public boolean connected = false;
 	
 	public static final float SIZETHRESHOLD = 100f;
@@ -72,12 +71,23 @@ public class ImageSender implements Runnable{
 	}
 	
 	public void run(){
-		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+		ByteArrayOutputStream buffer;
 		
 		try{
-			//Compression may be an option if the receiver is expecting a jpg
-			//buffer = compressImage(img, 0.5f);
-			ImageIO.write(img, "bmp", buffer);
+			ByteArrayOutputStream tmp = compressImage(img, 1.0f);
+		    ImageIO.write(img, "jpeg", tmp);
+		    tmp.close();
+		    
+		    int contentLength = tmp.size();
+		    float compress = 64000.0f/contentLength;
+		    System.out.println("Compress size "+compress);
+		    
+		    if(compress > 1.0) {
+		    	buffer = tmp;
+		    } else {
+		    	buffer = compressImage(img, compress);
+		    }
+
 		}catch(IOException e){
 			System.out.println(e);
 			return;
