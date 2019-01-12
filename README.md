@@ -22,7 +22,7 @@ device.
 Now that you have everything you need, open the server on the Desktop you are
 trying to connect to and click connect. Then open up the app on your mobile
 deivce. Make sure the IP address field matches the IP listed on your desktop
-server. Then click connect. Now, you are ready to control your dekstop.
+server. Then click connect. Now, you are ready to control your desktop.
 
 1. ServerWindow
 This class contains both the GUI and the server. Messages from
